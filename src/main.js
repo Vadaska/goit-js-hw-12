@@ -3,6 +3,8 @@ import {
   clearGallery,
   showLoader,
   hideLoader,
+  showLoadMore,
+  hideLoadMore,
 } from './js/render-functions';
 import { getImagesByQuery } from './js/pixabay-api';
 import iziToast from 'izitoast';
@@ -43,7 +45,7 @@ async function onSearchSubmit(event) {
   currentQuery = query;
   currentPage = 1;
   clearGallery();
-  loadMoreBtn.classList.add('hidden');
+  hideLoadMore();
   showLoader();
 
   try {
@@ -59,8 +61,9 @@ async function onSearchSubmit(event) {
     }
 
     createGallery(images);
-    currentPage += 1;
-    loadMoreBtn.classList.remove('hidden');
+    if (data.totalHits > 15) {
+      showLoadMore();
+    }
   } catch (error) {
     iziToast.error({
       message: 'Сталася помилка при завантаженні зображень.',
@@ -73,6 +76,8 @@ async function onSearchSubmit(event) {
 }
 
 async function onLoadMore() {
+  currentPage += 1;
+  hideLoadMore();
   showLoader();
 
   try {
@@ -80,17 +85,24 @@ async function onLoadMore() {
     const images = data.hits;
 
     if (images.length === 0 || currentPage * 15 >= data.totalHits) {
-      loadMoreBtn.classList.add('hidden');
+      iziToast.info({
+        message: `We're sorry, but you've reached the end of search results.`,
+        position: 'topRight',
+      });
+      hideLoadMore();
+      currentPage -= 1;
+      return;
     }
 
     createGallery(images);
-    currentPage += 1;
     scrollToGallery();
+    showLoadMore();
   } catch (error) {
     iziToast.error({
-      message: `We're sorry, but you've reached the end of search results.`,
+      message: 'Помилка завантаження. Спробуйте пізніше.',
       position: 'topRight',
     });
+    currentPage -= 1;
   } finally {
     hideLoader();
   }
