@@ -14,6 +14,8 @@ const form = document.querySelector('.form');
 const input = form.querySelector('input');
 const loadMoreBtn = document.querySelector('.load-more');
 
+const PER_PAGE = 15;
+
 let currentPage = 1;
 let currentQuery = '';
 
@@ -44,6 +46,7 @@ async function onSearchSubmit(event) {
 
   currentQuery = query;
   currentPage = 1;
+
   clearGallery();
   hideLoadMore();
   showLoader();
@@ -61,7 +64,14 @@ async function onSearchSubmit(event) {
     }
 
     createGallery(images);
-    if (data.totalHits > 15) {
+
+    if (data.totalHits <= PER_PAGE) {
+      iziToast.info({
+        message: `We're sorry, but you've reached the end of search results.`,
+        position: 'topRight',
+      });
+      hideLoadMore();
+    } else {
       showLoadMore();
     }
   } catch (error) {
@@ -84,19 +94,18 @@ async function onLoadMore() {
     const data = await getImagesByQuery(currentQuery, currentPage);
     const images = data.hits;
 
-    if (images.length === 0 || currentPage * 15 >= data.totalHits) {
+    createGallery(images);
+    scrollToGallery();
+
+    if (currentPage * PER_PAGE >= data.totalHits) {
       iziToast.info({
         message: `We're sorry, but you've reached the end of search results.`,
         position: 'topRight',
       });
       hideLoadMore();
-      currentPage -= 1;
-      return;
+    } else {
+      showLoadMore();
     }
-
-    createGallery(images);
-    scrollToGallery();
-    showLoadMore();
   } catch (error) {
     iziToast.error({
       message: 'Помилка завантаження. Спробуйте пізніше.',
