@@ -4,11 +4,26 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lesson-12</title>
+    <title>Lesson_11</title>
     <link rel="stylesheet" href="./css/styles.css" />
   </head>
   <body>
-    <main></main>
+    <main>
+      <form class="form">
+        <label>
+          <input
+            type="text"
+            name="search-text"
+            placeholder="Search images..."
+            required
+          />
+        </label>
+        <button type="submit">Search</button>
+      </form>
+      <ul class="gallery"></ul>
+      <button class="load-more hidden">Load more</button>
+      <div class="loader hidden"></div>
+    </main>
 
     <script type="module" src="./main.js"></script>
   </body>
